@@ -37,12 +37,13 @@
 
 4. [ ] net tools(unfinished)
 
-    收集在support/net/下，核心在于Connetion，客户端和用户端都能基于Connection进行通信，目前只有基于posix的实现。
+    收集在support/net/下，核心在于Connection，客户端和服务器端都能基于Connection进行通信。(目前只有基于posix的实现。)
 
     - 对于服务器端，提供Acceptor
 
     ```c++
     support::net::Acceptor acceptor{}; // 默认IPv4, TCP协议
+    // Acceptor acceptor{ Domain::IPv6, Type::UDP } // 也可以手动指定协议
     acceptor.bind(Endpoint{ 12345 });  // bind
     acceptor.listen();                 // 默认5
     auto connection = acceptor.accept();  // 通过此connection来与client通信
@@ -56,6 +57,7 @@
 
     ```c++
     support::net::Connector connector{}; // 默认IPv4, TCP协议
+    // Connector connector{ Domain::IPv6, Type::UDP }; // 也可以手动指定协议
     auto connection = connector.bind(Endpiont{ "localhost", 12345 });  // 通过此connection来与server通信
 
     // 和server交互
@@ -63,7 +65,7 @@
     auto received = connection->receive(1024);
     ```
 
-    - 基于Acceptor的简单迭代式服务器，BasicServer，继承BasicServer并实现on_connected方法
+    - 基于Acceptor的简单迭代式服务器，BasicServer，继承BasicServer并实现on_connected方法。可参考examples/simple_server.cpp
 
     ```c++
     using namespace support::net;
@@ -95,8 +97,8 @@
     };
     ```
 
-    - 基于Connector实现的简单迭代式客户端，BasicClient，继承BasicServer并实现on_connected方法，
-      和BasicServer的不同在于，start后只会执行一次on_connected方法，而BasicServer是不停轮询等待新的连接到来
+    - 基于Connector实现的简单迭代式客户端，BasicClient，继承BasicServer并实现on_connected方法。可参考examples/simple_client.cpp。
+      和BasicServer的不同在于，start后只会执行一次on_connected方法，而BasicServer则是不停轮询等待新的连接到来
 
     ```c++
     using namespace support::net;
@@ -104,7 +106,7 @@
     class EchoClient: public BasicClient {
     public:
         EchoClient(const Endpoint& peer)
-        : BasicClient{ peer }
+          : BasicClient{ peer }
         {}
 
         ~EchoClient() {}

@@ -1,5 +1,5 @@
 #include "support/Schedular.h"
-#include "posix/Selector.h"
+#include "posix/schedular/Selector.h"
 
 #include <memory>
 
@@ -42,7 +42,7 @@ void Schedular::remove_event(std::shared_ptr<Event> event)
 
 std::shared_ptr<Schedular> get_schedular()
 {
-    return std::make_shared<Selector>();
+    return std::make_shared<posix::Selector>();
 }
 
 } // namespace support

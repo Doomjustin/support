@@ -6,7 +6,7 @@
 #include <sys/select.h>
 
 
-namespace support {
+namespace support::posix {
 
 class Selector: public Schedular {
 public:
@@ -25,6 +25,6 @@ private:
     void dispatch();
 };
 
-} // namespace support
+} // namespace support::posix
 
 #endif // CPP_SUPPORT_POSIX_SELECTOR_H

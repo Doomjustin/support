@@ -3,6 +3,7 @@
 
 #include <concepts>
 #include <utility>
+#include <string>
 
 
 namespace support {
@@ -28,6 +29,19 @@ T& make_singleton(Args&&... args)
     static T singleton { std::forward<Args>(args)... };
 
     return singleton;
+}
+
+template<typename T>
+concept castable = requires (T t)
+{
+    { t.to_string() } ->  std::convertible_to<std::string>;
+};
+
+template<typename T>
+    requires castable<T>
+std::string to_string(const T& t)
+{
+    return t.to_string();
 }
 
 } // namespace support

@@ -4,7 +4,7 @@
 #include <sys/select.h>
 
 
-namespace support {
+namespace support::posix {
 
 void Selector::schedule()
 {
@@ -53,4 +53,4 @@ void Selector::dispatch()
     }
 }
 
-} // namespace support
+} // namespace support::posix

@@ -5,6 +5,7 @@ add_library(support-net
         Connector.cpp
         Connection.cpp
         Acceptor.cpp
+        Server.cpp
 )
 add_library(support::net ALIAS support-net)
 

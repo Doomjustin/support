@@ -17,7 +17,8 @@ std::string Connection::receive(std::size_t size)
     std::string res{};
     res.resize(size);
 
-    socket_->read(res.data(), res.size());
+    auto real_size = socket_->read(res.data(), res.size());
+    res.resize(real_size);
 
     return res;
 }

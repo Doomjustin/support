@@ -11,6 +11,11 @@ BasicServer::BasicServer(Domain domain, Type type)
     state_{ ServerState::Init }
 {}
 
+BasicServer::~BasicServer()
+{
+    stop();
+}
+
 void BasicServer::start()
 {
     acceptor_->bind(self_);

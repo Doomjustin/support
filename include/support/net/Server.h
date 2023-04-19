@@ -15,7 +15,7 @@ class BasicServer {
 public:
     BasicServer(Domain domain = Domain::IPv4, Type type = Type::TCP);
 
-    ~BasicServer() {}
+    ~BasicServer();
 
     void start();
     void stop();

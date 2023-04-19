@@ -29,6 +29,11 @@ public:
     {
         support::log::info("echo server started");
     }
+
+    void on_stop() override
+    {
+        support::log::info("echo server stopped");
+    }
 };
 
 int main(int argc, char* argv[])

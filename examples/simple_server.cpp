@@ -11,11 +11,9 @@ using namespace support::net;
 
 class EchoServer: public BasicServer {
 public:
-    EchoServer(const Endpoint self)
-      : BasicServer{}
-    {
-        self_ = self;
-    }
+    EchoServer(const Endpoint& self)
+      : BasicServer{ self }
+    {}
 
     ~EchoServer() {}
 

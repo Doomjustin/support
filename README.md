@@ -34,3 +34,86 @@
 
     timer_manager.run();        // 启动manager以开始管理执行注册的timer
     ```
+
+4. [ ] net tools(unfinished)
+
+    收集在support/net/下，核心在于Connetion，客户端和用户端都能基于Connection进行通信，目前只有基于posix的实现。
+
+    - 对于服务器端，提供Acceptor
+
+    ```c++
+    support::net::Acceptor acceptor{}; // 默认IPv4, TCP协议
+    acceptor.bind(Endpoint{ 12345 });  // bind
+    acceptor.listen();                 // 默认5
+    auto connection = acceptor.accept();  // 通过此connection来与client通信
+
+    // 和cilent交互
+    auto received = connection->receive(1024); // 指定本次读取的最大数据量
+    connection->send(received);   // 将收到的数据原样放回，实现echo server的效果
+    ```
+
+    - 对于客户端，提供Connector
+
+    ```c++
+    support::net::Connector connector{}; // 默认IPv4, TCP协议
+    auto connection = connector.bind(Endpiont{ "localhost", 12345 });  // 通过此connection来与server通信
+
+    // 和server交互
+    connection->send("hello world");
+    auto received = connection->receive(1024);
+    ```
+
+    - 基于Acceptor的简单迭代式服务器，BasicServer，继承BasicServer并实现on_connected方法
+
+    ```c++
+    using namespace support::net;
+
+    class EchoServer: public BasicServer {
+    public:
+        EchoServer(const Endpoint& self)
+          : BasicServer{ self }
+        {}
+
+        ~EchoServer() {}
+
+        void on_connected(std::shared_ptr<Connection> connction) override
+        {
+            // 这是一个echo server
+            auto received_ = connction->receive(1024);
+            connction->send(received_);
+        }
+
+        void on_start() override
+        {
+            support::log::info("echo server started");
+        }
+
+        void on_stop() override
+        {
+            support::log::info("echo server stopped");
+        }
+    };
+    ```
+
+    - 基于Connector实现的简单迭代式客户端，BasicClient，继承BasicServer并实现on_connected方法，
+      和BasicServer的不同在于，start后只会执行一次on_connected方法，而BasicServer是不停轮询等待新的连接到来
+
+    ```c++
+    using namespace support::net;
+
+    class EchoClient: public BasicClient {
+    public:
+        EchoClient(const Endpoint& peer)
+        : BasicClient{ peer }
+        {}
+
+        ~EchoClient() {}
+
+        void on_connected(std::shared_ptr<Connection> connection) override
+        {
+            connection->send("hello world");
+            auto received = connection->receive(1024);
+            fmt::print("received from server: {}\n", received);
+        }
+    };
+    ```

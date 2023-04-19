@@ -13,7 +13,8 @@ namespace support::net {
 // 迭代式服务器，一次只能处理一个连接
 class BasicServer {
 public:
-    BasicServer(Domain domain = Domain::IPv4, Type type = Type::TCP);
+    explicit BasicServer(Domain domain = Domain::IPv4, Type type = Type::TCP);
+    explicit BasicServer(Endpoint self, Domain domain = Domain::IPv4, Type type = Type::TCP);
 
     ~BasicServer();
 
@@ -39,9 +40,7 @@ protected:
     Endpoint self_;
     int listen_backlog_ = 5;
 
-private:
     void run();
-
     constexpr bool should_stop() const noexcept { return state_ == ServerState::Exit; }
 };
 

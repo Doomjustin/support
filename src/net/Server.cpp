@@ -11,6 +11,13 @@ BasicServer::BasicServer(Domain domain, Type type)
     state_{ ServerState::Init }
 {}
 
+BasicServer::BasicServer(Endpoint self, Domain domain, Type type)
+  : acceptor_{ std::make_unique<Acceptor>(domain, type) },
+    state_{ ServerState::Init },
+    self_{ self }
+{}
+
+
 BasicServer::~BasicServer()
 {
     stop();

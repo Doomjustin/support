@@ -31,8 +31,8 @@ public:
     ~ThreadPool();
 
     template<typename F, typename... Args>
-    std::future<std::invoke_result_t<F, Args...>>
-        submit(F f, Args&&... args)
+        requires std::invocable<F, Args...>
+    std::future<std::invoke_result_t<F, Args...>> submit(F f, Args&&... args)
     {
         using result_type = std::invoke_result_t<F, Args...>;
 

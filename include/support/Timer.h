@@ -31,7 +31,7 @@ public:
       : expiry_{ ClockType::now() + run_after },
         interval_{ repeat_interval }
     {
-        task_ = std::bind(std::forward<F>(func), std::forward<Args>(args)...);
+        task_ = std::bind(std::move<F>(func), std::forward<Args>(args)...);
     }
 
     template<typename F, typename... Args>
@@ -40,7 +40,7 @@ public:
       : expiry_{ ClockType::now() + run_after },
         interval_{}
     {
-        task_ = std::bind(std::forward<F>(func), std::forward<Args>(args)...);
+        task_ = std::bind(std::move<F>(func), std::forward<Args>(args)...);
     }
 
     constexpr TimePointType expiry() const noexcept { return expiry_; }
@@ -94,14 +94,14 @@ public:
         requires std::invocable<F, Args...>
     void add_timer(DurationType run_after, DurationType repeat_interval, F func, Args... args)
     {
-        timers_.emplace(run_after, repeat_interval, std::forward<F>(func), std::forward<Args>(args)...);
+        timers_.emplace(run_after, repeat_interval, std::move<F>(func), std::forward<Args>(args)...);
     }
 
     template<typename F, typename... Args>
         requires std::invocable<F, Args...>
     void add_timer(DurationType run_after, F func, Args... args)
     {
-        timers_.emplace(run_after, std::forward<F>(func), std::forward<Args>(args)...);
+        timers_.emplace(run_after, std::move<F>(func), std::forward<Args>(args)...);
     }
 
     void add_timer(const TimerType& timer)

@@ -12,6 +12,7 @@ add_subdirectory(Log)
 add_library(support
     STATIC
         Log.cpp
+        ThreadPool.cpp
 )
 
 target_include_directories(support PUBLIC ${SUPPORT_INCLUDE_DIR})

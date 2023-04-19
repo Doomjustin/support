@@ -4,6 +4,7 @@ function(add_support_test target source)
 endfunction()
 
 add_support_test(test-log test_log.cpp)
+add_support_test(test-threadpool test_thread_pool.cpp)
 
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)

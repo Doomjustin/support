@@ -1,3 +1,11 @@
+function(add_support_test target source)
+    add_executable(${target} ${source})
+    target_link_libraries(${target} support)
+endfunction()
+
+add_support_test(test-log test_log.cpp)
+
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(AddCatch2)
 include(CTest)

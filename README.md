@@ -78,18 +78,20 @@
 
         ~EchoServer() {}
 
-        void on_connected(std::shared_ptr<Connection> connction) override
+        void on_connected(std::shared_ptr<Connection> connection) override
         {
             // 这是一个echo server
-            auto received_ = connction->receive(1024);
-            connction->send(received_);
+            auto received_ = connection->receive(1024);
+            connection->send(received_);
         }
 
+        // 非必须实现
         void on_start() override
         {
             support::log::info("echo server started");
         }
 
+        // 非必须实现
         void on_stop() override
         {
             support::log::info("echo server stopped");

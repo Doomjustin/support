@@ -17,10 +17,10 @@ public:
 
     ~EchoServer() {}
 
-    void on_connected(std::shared_ptr<Connection> connction) override
+    void on_connected(std::shared_ptr<Connection> connection) override
     {
-        auto received_ = connction->receive(1024);
-        connction->send(received_);
+        auto received_ = connection->receive(1024);
+        connection->send(received_);
     }
 
     void on_start() override

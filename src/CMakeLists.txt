@@ -14,6 +14,11 @@ add_library(support
         Log.cpp
         ThreadPool.cpp
         Schedular.cpp
+        Net.cpp
+        net/Socket.cpp
+        net/Connection.cpp
+        net/Connector.cpp
+        net/Acceptor.cpp
 )
 
 target_include_directories(support PUBLIC ${SUPPORT_INCLUDE_DIR})

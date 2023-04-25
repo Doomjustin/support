@@ -1,51 +1,43 @@
-#include "support/net/Connector.h"
-#include "support/net/Endpoint.h"
-#include "support/net/Socket.h"
-#include "support/net/Client.h"
-
-#include "fmt/core.h"
+#include "support/Net.h"
 
 #include <cstdlib>
 #include <iostream>
-#include <memory>
 
 using namespace support::net;
 
-class EchoClient: public BasicClient {
+class EchoClient: public SimpleClient {
 public:
-    EchoClient(const Endpoint& peer)
-      : BasicClient{ peer }
+    EchoClient(Domain domain, Type type, const Endpoint& peer)
+      : SimpleClient{ domain, type, peer }
     {}
 
     ~EchoClient() {}
 
-    void on_connected(std::shared_ptr<Connection> connection) override
+    void ticks(IConnection& connection) override
     {
-        bool active = true;
-        while (active) {
-            std::string in{};
-            std::cin >> in;
-            connection->send(in);
-            auto received = connection->receive(1024);
-            std::cout << ">> " << received << std::endl;
+        std::string getin;
 
-            if (received == "quit")
-                active = false;
-        }
+        std::cin >> getin;
+
+        connection.write(getin.c_str(), getin.size());
+
+        char buffer[4096];
+        auto read_bytes = connection.read(buffer, 4096);
+        buffer[read_bytes] = 0;
+        std::cout << buffer << "\n";
+
+        if (getin == "quit")
+            finish();
+
     }
 };
 
 
-int main()
+int main(int argc, char* argv[])
 {
-    Endpoint target{ "localhost", 12345 };
-    // Connector connector{ Domain::IPv4, Type::TCP };
-    // auto connection = connector.connect(target);
-    // connection->send("nothing to say");
-    // auto received = connection->receive(1024);
-    // fmt::print("{}\n", received);
+    const Endpoint peer_endpoint{ 12345 };
+    EchoClient client{ Domain::IPv4, Type::TCP, peer_endpoint };
 
-    EchoClient client{ target };
     client.start();
 
     return EXIT_SUCCESS;

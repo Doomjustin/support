@@ -24,13 +24,18 @@ enum class Type {
 
 class Endpoint {
 public:
-    explicit Endpoint(const std::string& host, std::uint16_t port = 0);
-    explicit Endpoint(std::uint16_t port = 0);
+    explicit Endpoint(const std::string& host, std::uint16_t port = 0)
+      : host_{ host }, port_{ port }
+    {}
+
+    explicit Endpoint(std::uint16_t port = 0)
+      : host_{}, port_{ port }
+    {}
 
     constexpr std::uint16_t port() const noexcept { return port_; }
     std::string_view host() const noexcept { return host_; }
 
-    std::string to_string() const noexcept;
+    // std::string to_string() const noexcept;
 
 private:
     std::string host_;
@@ -39,94 +44,83 @@ private:
 
 
 // 双方建立连接后，负责收发数据
-class Connection: public Noncopyable {
+class IConnection: public Noncopyable {
 public:
-    Connection() {}
+    IConnection() {}
 
-    Connection(Connection&&) noexcept = default;
-    Connection& operator=(Connection&&) noexcept = default;
+    IConnection(IConnection&&) noexcept = default;
+    IConnection& operator=(IConnection&&) noexcept = default;
 
-    ~Connection() {}
+    ~IConnection() {}
 
-    virtual constexpr bool is_valid() const noexcept = 0;
     virtual std::size_t read(void* buffer, std::size_t nbytes) = 0;
     virtual std::size_t write(const void* buffer, std::size_t nbytes) = 0;
 
+    virtual constexpr bool is_valid() const noexcept = 0;
     virtual constexpr Domain domain() const noexcept = 0;
     virtual constexpr Type type() const noexcept = 0;
 };
 
 
 // 作为客户端连接服务器
-class Connector: public Noncopyable {
+class IConnector: public Noncopyable {
 public:
-    Connector() {}
+    IConnector() {}
 
-    Connector(Connector&&) noexcept = default;
-    Connector& operator=(Connector&&) noexcept = default;
+    IConnector(IConnector&&) noexcept = default;
+    IConnector& operator=(IConnector&&) noexcept = default;
 
-    ~Connector() {}
+    ~IConnector() {}
 
-    virtual std::unique_ptr<Connection> connect(const Endpoint& peer) = 0;
-    virtual constexpr bool is_valid() const noexcept = 0;
+    virtual std::unique_ptr<IConnection> connect(const Endpoint& peer) = 0;
 
-    virtual constexpr Domain domain() const noexcept = 0;
-    virtual constexpr Type type() const noexcept = 0;
+    virtual bool is_valid() const noexcept = 0;
+    virtual Domain domain() const noexcept = 0;
+    virtual Type type() const noexcept = 0;
 };
 
-std::unique_ptr<Connector> make_connector(Domain domain = Domain::IPv4, Type type = Type::TCP);
+std::unique_ptr<IConnector> make_connector(Domain domain = Domain::IPv4, Type type = Type::TCP);
 
 
 // 服务器等待客户端连接
-class Acceptor: public Noncopyable {
+class IAcceptor: public Noncopyable {
 public:
-    Acceptor() {}
+    IAcceptor() {}
 
-    Acceptor(Acceptor&&) noexcept = default;
-    Acceptor& operator=(Acceptor&&) noexcept = default;
+    IAcceptor(IAcceptor&&) noexcept = default;
+    IAcceptor& operator=(IAcceptor&&) noexcept = default;
 
-    ~Acceptor() {}
+    ~IAcceptor() {}
 
     virtual void bind(const Endpoint& self) = 0;
     virtual void listen(int backlog = 5) = 0;
-    virtual std::unique_ptr<Connection> accept() = 0;
+    virtual std::unique_ptr<IConnection> accept() = 0;
+
+    virtual void reuse_address(bool on = true) = 0;
+    virtual void keep_alive(bool on = true) = 0;
+
     virtual constexpr bool is_valid() const noexcept = 0;
-
-    virtual void reuse_address() = 0;
-    virtual void keep_alive() = 0;
-
     virtual constexpr Domain domain() const noexcept = 0;
     virtual constexpr Type type() const noexcept = 0;
 };
 
-std::unique_ptr<Acceptor> make_acceptor(Domain domain = Domain::IPv4, Type type = Type::TCP);
+std::unique_ptr<IAcceptor> make_acceptor(Domain domain = Domain::IPv4, Type type = Type::TCP);
 
 
+// 基础的客户端
 class SimpleClient: public Noncopyable {
 public:
-    SimpleClient(Domain domain, Type type, const Endpoint& peer)
-      : state_{ ClientState::Initializing },
-        peer_{ peer },
-        connector_{ make_connector(domain, type) },
-        connection_{}
-    {}
+    SimpleClient(Domain domain, Type type, const Endpoint& peer);
 
     SimpleClient(SimpleClient&&) noexcept = default;
     SimpleClient& operator=(SimpleClient&&) noexcept = default;
 
     ~SimpleClient() {}
 
-    void start()
-    {
-        connection_ = std::move(connector_->connect(peer_));
+    void start();
 
-        begin();
-        run();
-        end();
-    }
-
-    constexpr Domain domain() const noexcept { return connector_->domain(); }
-    constexpr Type type() const noexcept { return connector_->type(); }
+    Domain domain() const noexcept { return connector_->domain(); }
+    Type type() const noexcept { return connector_->type(); }
 
 protected:
     enum class ClientState {
@@ -138,31 +132,69 @@ protected:
 protected:
     ClientState state_;
     Endpoint peer_;
-    std::unique_ptr<Connector> connector_;
-    std::unique_ptr<Connection> connection_;
+    std::unique_ptr<IConnector> connector_;
+    std::unique_ptr<IConnection> connection_;
 
     virtual void begin() {}
     virtual void end() {}
     // 通过实现ticks来处理业务逻辑，connection可以进行双方的通信
-    virtual void ticks([[maybe_unused]] Connection& connection) {}
+    virtual void ticks([[maybe_unused]] IConnection& connection) {}
 
     // 可在ticks()中，调用以退出Client处理
-    void finish() noexcept
-    {
-        state_ = ClientState::Finished;
-    }
+    void finish() noexcept;
 
 private:
-    void run()
+    void run();
+
+    constexpr bool finished() const noexcept
     {
-        state_ = ClientState::Active;
-
-        while (!finished()) {
-            ticks(*connection_);
-        }
+        return state_ == ClientState::Finished;
     }
+};
 
-    constexpr bool finished() const noexcept { return state_ == ClientState::Finished; }
+
+// 一次仅能处理一个连接的简单服务器
+class SimpleServer {
+public:
+    SimpleServer(Domain domain, Type type, const Endpoint& self);
+
+    SimpleServer(SimpleServer&&) noexcept = default;
+    SimpleServer& operator=(SimpleServer&&) noexcept = default;
+
+    ~SimpleServer() {}
+
+    void start();
+
+    Domain domain() const noexcept { return acceptor_->domain(); }
+    Type type() const noexcept { return acceptor_->type(); }
+
+protected:
+    enum class ServerState {
+        Initializing,
+        Active,
+        Finished
+    };
+
+protected:
+    ServerState state_;
+    Endpoint self_;
+    std::unique_ptr<IAcceptor> acceptor_;
+
+    virtual void begin() {}
+    virtual void end() {}
+    // 通过实现on_connect来处理一条连接的业务，connection可以进行双方的通信
+    virtual void on_connect([[maybe_unused]] IConnection& connection) {}
+
+    // 可在ticks()中，调用以退出Client处理
+    void finish() noexcept;
+
+private:
+    void run();
+
+    constexpr bool finished() const noexcept
+    {
+        return state_ == ServerState::Finished;
+    }
 };
 
 } // namespace support::net

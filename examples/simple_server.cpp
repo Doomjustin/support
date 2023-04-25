@@ -1,58 +1,39 @@
-#include "support/Log.h"
-#include "support/net/Acceptor.h"
-#include "support/net/Connection.h"
-#include "support/net/Endpoint.h"
-#include "support/net/Server.h"
+#include "support/Net.h"
 
 #include <cstdlib>
-#include <memory>
+#include <iostream>
+
 
 using namespace support::net;
 
-class EchoServer: public BasicServer {
+
+class EchoServer: public SimpleServer {
 public:
-    EchoServer(const Endpoint& self)
-      : BasicServer{ self }
+    EchoServer(Domain domain, Type type, const Endpoint& self)
+      : SimpleServer{ domain, type, self }
     {}
 
     ~EchoServer() {}
 
-    void on_connected(std::shared_ptr<Connection> connection) override
+    void on_connect(IConnection& connection) override
     {
-        bool active = true;
-        while (active) {
-            auto received_ = connection->receive(1024);
-            if (received_ == "quit")
-                active = false;
-            connection->send(received_);
+        std::cout << "new connection came" << "\n";
+        char buffer[4096];
+        auto read_bytes = connection.read(buffer, 4096);
+        // 将所有数据都反写回客户端
+        while (read_bytes != 0) {
+            std::cout << "received: " << buffer << std::endl;
+            connection.write(buffer, read_bytes);
+            read_bytes = connection.read(buffer, 4096);
         }
-    }
-
-    void on_start() override
-    {
-        support::log::info("echo server started");
-    }
-
-    void on_stop() override
-    {
-        support::log::info("echo server stopped");
     }
 };
 
+
 int main(int argc, char* argv[])
 {
-    // Acceptor acceptor{};
-    // Endpoint self{ 12345 };
-    // acceptor.bind(self);
-    // acceptor.listen();
-
-    // while (true) {
-    //     auto connection = acceptor.accept();
-    //     auto received = connection->receive(1024);
-    //     connection->send("hello world");
-    // }
-
-    EchoServer server{ Endpoint{ 12345 } };
+    const Endpoint self_address{ 12345 };
+    EchoServer server{ Domain::IPv4, Type::TCP, self_address };
     server.start();
 
     return EXIT_SUCCESS;

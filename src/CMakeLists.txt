@@ -8,6 +8,7 @@ set(SUPPORT_INTERNAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/support)
 # Log Module
 add_subdirectory(log)
 add_subdirectory(posix)
+add_subdirectory(net)
 
 add_library(support
     STATIC
@@ -15,10 +16,8 @@ add_library(support
         ThreadPool.cpp
         Schedular.cpp
         Net.cpp
-        net/Socket.cpp
-        net/Connection.cpp
-        net/Connector.cpp
-        net/Acceptor.cpp
+        Client/SimpleClient.cpp
+        Server/SimpleServer.cpp
 )
 
 target_include_directories(support PUBLIC ${SUPPORT_INCLUDE_DIR})
@@ -28,4 +27,5 @@ target_link_libraries(support
     PRIVATE
         support::log
         support::posix
+        support::net
 )

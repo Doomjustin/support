@@ -23,6 +23,11 @@ public:
 
     std::shared_ptr<Socket> socket() const noexcept { return socket_; }
 
+    bool is_valid() const noexcept { return socket_->is_valid(); }
+
+    void keep_alive(bool on) { socket_->keep_alive(on); }
+    void address_reuse(bool on) { socket_->address_reuse(on); }
+
 private:
     std::shared_ptr<Socket> socket_;
 };

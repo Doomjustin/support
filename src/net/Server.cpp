@@ -17,7 +17,6 @@ BasicServer::BasicServer(Endpoint self, Domain domain, Type type)
     self_{ self }
 {}
 
-
 BasicServer::~BasicServer()
 {
     stop();
@@ -25,6 +24,9 @@ BasicServer::~BasicServer()
 
 void BasicServer::start()
 {
+    acceptor_->address_reuse(true);
+    acceptor_->keep_alive(true);
+
     acceptor_->bind(self_);
     acceptor_->listen(listen_backlog_);
 

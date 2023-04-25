@@ -14,8 +14,6 @@ public:
     using CallbackType = std::function<void()>;
 
 public:
-    explicit Event(int fd);
-
     ~Event() {}
 
     template<typename F, typename... Args>

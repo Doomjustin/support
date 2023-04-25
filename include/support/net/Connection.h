@@ -4,6 +4,7 @@
 #include "support/net/Endpoint.h"
 #include "support/net/Socket.h"
 
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 
@@ -17,9 +18,17 @@ public:
 
     ~Connection() {}
 
+    std::size_t read(void* buffer, std::size_t length);
+
+    std::size_t write(const void* buffer, std::size_t length);
+
     void send(const std::string& value);
 
     std::string receive(std::size_t size);
+
+    std::shared_ptr<Socket> socket() const noexcept { return socket_; }
+
+    bool is_valid() const noexcept { return socket_->is_valid(); }
 
 protected:
     std::shared_ptr<net::Socket> socket_;

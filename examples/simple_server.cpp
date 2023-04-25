@@ -19,8 +19,13 @@ public:
 
     void on_connected(std::shared_ptr<Connection> connection) override
     {
-        auto received_ = connection->receive(1024);
-        connection->send(received_);
+        bool active = true;
+        while (active) {
+            auto received_ = connection->receive(1024);
+            if (received_ == "quit")
+                active = false;
+            connection->send(received_);
+        }
     }
 
     void on_start() override

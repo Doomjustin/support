@@ -6,6 +6,7 @@
 #include "fmt/core.h"
 
 #include <cstdlib>
+#include <iostream>
 #include <memory>
 
 using namespace support::net;
@@ -20,9 +21,17 @@ public:
 
     void on_connected(std::shared_ptr<Connection> connection) override
     {
-        connection->send("hello world");
-        auto received = connection->receive(1024);
-        fmt::print("received from server: {}\n", received);
+        bool active = true;
+        while (active) {
+            std::string in{};
+            std::cin >> in;
+            connection->send(in);
+            auto received = connection->receive(1024);
+            std::cout << ">> " << received << std::endl;
+
+            if (received == "quit")
+                active = false;
+        }
     }
 };
 

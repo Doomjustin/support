@@ -1,8 +1,7 @@
 #ifndef CPP_SUPPORT_POSIX_POSIX_UTILS_H
 #define CPP_SUPPORT_POSIX_POSIX_UTILS_H
 
-#include "support/net/Socket.h"
-#include "support/net/Endpoint.h"
+#include "support/Net.h"
 
 #include <string_view>
 #include <source_location>

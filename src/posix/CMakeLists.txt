@@ -2,7 +2,6 @@ add_library(support-posix
     OBJECT
         PosixUtils.cpp
         schedular/Selector.cpp
-        net/PosixSocket.cpp
 )
 add_library(support::posix ALIAS support-posix)
 

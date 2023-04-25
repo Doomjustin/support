@@ -61,7 +61,7 @@ void PosixSocket::listen(int backlog)
     check_result(res);
 }
 
-std::unique_ptr<support::net::Socket> PosixSocket::accept()
+support::net::SocketPtr PosixSocket::accept()
 {
     switch (domain()) {
     case support::net::Domain::IPv4:
@@ -130,7 +130,7 @@ void PosixSocket::connect_ipv6(const support::net::Endpoint& peer)
     check_result(res);
 }
 
-std::unique_ptr<support::net::Socket> PosixSocket::accept_ipv4()
+support::net::SocketPtr PosixSocket::accept_ipv4()
 {
     sockaddr_in addr{};
     socklen_t length{};
@@ -138,12 +138,13 @@ std::unique_ptr<support::net::Socket> PosixSocket::accept_ipv4()
     check_result(res);
 
     auto peer_endpoint = cast_to_endpoint(addr);
-    auto peer_socket = std::make_unique<PosixSocket>(res, domain_, type_);
+    support::net::SocketPtr peer_socket{ new PosixSocket{ res, domain_, type_ },
+                                         support::net::SocketDeleter{} };
 
     return peer_socket;
 }
 
-std::unique_ptr<support::net::Socket> PosixSocket::accept_ipv6()
+support::net::SocketPtr PosixSocket::accept_ipv6()
 {
     sockaddr_in6 addr{};
     socklen_t length{};
@@ -151,7 +152,8 @@ std::unique_ptr<support::net::Socket> PosixSocket::accept_ipv6()
     check_result(res);
 
     auto peer_endpoint = cast_to_endpoint(addr);
-    auto peer_socket = std::make_unique<PosixSocket>(res, domain_, type_);
+    support::net::SocketPtr peer_socket{ new PosixSocket{ res, domain_, type_ },
+                                         support::net::SocketDeleter{} };
 
     return peer_socket;
 }

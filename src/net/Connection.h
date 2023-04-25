@@ -11,8 +11,7 @@ namespace support::net {
 
 class Connection: public IConnection {
 public:
-    Connection(std::unique_ptr<Socket> socket);
-    Connection(std::unique_ptr<SocketGuard> socket);
+    Connection(SocketPtr socket);
 
     Connection(Connection&&) noexcept = default;
     Connection& operator=(Connection&&) noexcept = default;
@@ -38,7 +37,7 @@ public:
     }
 
 private:
-    std::unique_ptr<SocketGuard> socket_;
+    SocketPtr socket_;
 };
 
 } // namespace support::net

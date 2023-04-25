@@ -8,7 +8,7 @@
 namespace support::net {
 
 Acceptor::Acceptor(Domain domain, Type type)
-  : socket_{ std::make_unique<SocketGuard>(domain, type) }
+  : socket_{ make_socket(domain, type) }
 {}
 
 void Acceptor::bind(const Endpoint& self)
@@ -24,6 +24,7 @@ void Acceptor::listen(int backlog)
 std::unique_ptr<IConnection> Acceptor::accept()
 {
     auto peer_socket = socket_->accept();
+
     return std::make_unique<Connection>(std::move(peer_socket));
 }
 

@@ -29,7 +29,7 @@ public:
 
     void bind(const support::net::Endpoint& self) override;
     void listen(int backlog = 5) override;
-    std::unique_ptr<support::net::Socket> accept() override;
+    support::net::SocketPtr accept() override;
     void reuse_address(bool on = true) override;
     void keep_alive(bool on = true) override;
 
@@ -45,8 +45,8 @@ private:
     void bind_ipv4(const support::net::Endpoint& self);
     void bind_ipv6(const support::net::Endpoint& self);
 
-    std::unique_ptr<support::net::Socket> accept_ipv4();
-    std::unique_ptr<support::net::Socket> accept_ipv6();
+    support::net::SocketPtr accept_ipv4();
+    support::net::SocketPtr accept_ipv6();
 };
 
 } // namespace support::posix

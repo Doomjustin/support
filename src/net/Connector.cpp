@@ -10,7 +10,7 @@ namespace support::net {
 
 Connector::Connector(Domain domain, Type type)
   : IConnector{},
-    socket_{ std::make_unique<SocketGuard>(domain, type) }
+    socket_{ make_socket(domain, type) }
 {}
 
 std::unique_ptr<IConnection> Connector::connect(const Endpoint& peer)

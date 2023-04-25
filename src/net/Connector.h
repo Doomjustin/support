@@ -36,7 +36,7 @@ public:
     }
 
 private:
-    std::unique_ptr<SocketGuard> socket_;
+    SocketPtr socket_;
 };
 
 } // namespace support::net

@@ -8,6 +8,10 @@
 
 namespace support::net {
 
+class SocketDeleter;
+class Socket;
+using SocketPtr = std::unique_ptr<Socket, SocketDeleter>;
+
 // 对Socket的简单包装，过于底层，用户不应该直接使用
 class Socket: public Noncopyable {
 public:
@@ -33,7 +37,7 @@ public:
 
     virtual void bind(const Endpoint& self) = 0;
     virtual void listen(int backlog = 5) = 0;
-    virtual std::unique_ptr<Socket> accept() = 0;
+    virtual SocketPtr accept() = 0;
 
     virtual void reuse_address(bool on = true) = 0;
     virtual void keep_alive(bool on = true) = 0;
@@ -46,58 +50,15 @@ protected:
     Type type_;
 };
 
-std::unique_ptr<Socket> make_socket(Domain domain, Type type);
-
-
-// 对socket的wrapper，析构时自动关闭
-class SocketGuard: public Noncopyable {
+class SocketDeleter {
 public:
-    SocketGuard(std::unique_ptr<Socket> socket);
-    SocketGuard(Domain domain, Type type);
-
-    SocketGuard(SocketGuard&&) noexcept = default;
-    SocketGuard& operator=(SocketGuard&&) noexcept = default;
-
-    ~SocketGuard();
-
-    Domain domain() const noexcept
+    void operator()(Socket* socket)
     {
-        return socket_->domain();
+        socket->close();
     }
-
-    Type type() const noexcept
-    {
-        return socket_->type();
-    }
-
-    constexpr bool is_valid() const noexcept
-    {
-        return is_valid_ && socket_->is_valid();
-    }
-
-    void connect(const Endpoint& peer);
-
-    void bind(const Endpoint& self);
-    void listen(int backlog = 5);
-    std::unique_ptr<Socket> accept();
-
-    void reuse_address(bool on = true);
-    void keep_alive(bool on = true);
-
-    std::size_t read(void* buffer, std::size_t nbytes);
-    std::size_t write(const void* buffer, std::size_t nbytes);
-
-    // 放弃管理socket
-    std::unique_ptr<Socket> release() noexcept
-    {
-        is_valid_ = false;
-        return std::move(socket_);
-    }
-
-private:
-    bool is_valid_ = true;
-    std::unique_ptr<Socket> socket_;
 };
+
+SocketPtr make_socket(Domain domain, Type type);
 
 } // namespace support::net
 

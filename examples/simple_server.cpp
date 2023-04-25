@@ -22,6 +22,7 @@ public:
         auto read_bytes = connection.read(buffer, 4096);
         // 将所有数据都反写回客户端
         while (read_bytes != 0) {
+            buffer[read_bytes] = 0;
             std::cout << "received: " << buffer << std::endl;
             connection.write(buffer, read_bytes);
             read_bytes = connection.read(buffer, 4096);

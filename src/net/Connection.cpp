@@ -5,12 +5,7 @@
 
 namespace support::net {
 
-Connection::Connection(std::unique_ptr<Socket> socket)
-  : IConnection{},
-    socket_{ std::make_unique<SocketGuard>(std::move(socket)) }
-{}
-
-Connection::Connection(std::unique_ptr<SocketGuard> socket)
+Connection::Connection(SocketPtr socket)
   : IConnection{},
     socket_{ std::move(socket) }
 {}

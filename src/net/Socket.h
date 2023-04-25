@@ -70,6 +70,11 @@ public:
         return socket_->type();
     }
 
+    constexpr bool is_valid() const noexcept
+    {
+        return is_valid_ && socket_->is_valid();
+    }
+
     void connect(const Endpoint& peer);
 
     void bind(const Endpoint& self);
@@ -79,18 +84,18 @@ public:
     void reuse_address(bool on = true);
     void keep_alive(bool on = true);
 
-    bool is_valid() const noexcept
-    {
-        return static_cast<bool>(socket_) && socket_->is_valid();
-    }
-
     std::size_t read(void* buffer, std::size_t nbytes);
     std::size_t write(const void* buffer, std::size_t nbytes);
 
-    // 释放管理
-    std::unique_ptr<Socket> release() noexcept { return std::move(socket_); }
+    // 放弃管理socket
+    std::unique_ptr<Socket> release() noexcept
+    {
+        is_valid_ = false;
+        return std::move(socket_);
+    }
 
 private:
+    bool is_valid_ = true;
     std::unique_ptr<Socket> socket_;
 };
 

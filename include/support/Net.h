@@ -56,9 +56,9 @@ public:
     virtual std::size_t read(void* buffer, std::size_t nbytes) = 0;
     virtual std::size_t write(const void* buffer, std::size_t nbytes) = 0;
 
-    virtual constexpr bool is_valid() const noexcept = 0;
-    virtual constexpr Domain domain() const noexcept = 0;
-    virtual constexpr Type type() const noexcept = 0;
+    virtual bool is_valid() const noexcept = 0;
+    virtual Domain domain() const noexcept = 0;
+    virtual Type type() const noexcept = 0;
 };
 
 
@@ -99,9 +99,9 @@ public:
     virtual void reuse_address(bool on = true) = 0;
     virtual void keep_alive(bool on = true) = 0;
 
-    virtual constexpr bool is_valid() const noexcept = 0;
-    virtual constexpr Domain domain() const noexcept = 0;
-    virtual constexpr Type type() const noexcept = 0;
+    virtual bool is_valid() const noexcept = 0;
+    virtual Domain domain() const noexcept = 0;
+    virtual Type type() const noexcept = 0;
 };
 
 std::unique_ptr<IAcceptor> make_acceptor(Domain domain = Domain::IPv4, Type type = Type::TCP);

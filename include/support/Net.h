@@ -59,6 +59,10 @@ public:
     virtual bool is_valid() const noexcept = 0;
     virtual Domain domain() const noexcept = 0;
     virtual Type type() const noexcept = 0;
+
+    virtual int native_handler() const noexcept = 0;
+    // FIXME: instead of shutdown might be better?
+    virtual void close() const noexcept = 0;
 };
 
 

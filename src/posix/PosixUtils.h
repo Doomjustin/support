@@ -3,14 +3,14 @@
 
 #include "support/Net.h"
 
-#include <string_view>
+#include <string>
 #include <source_location>
 #include <netinet/in.h>
 
 
 namespace support::posix {
 
-void check_result(int res, std::string_view caller);
+void check_result(int res, const std::string& caller);
 void check_result(int res, std::source_location cur = std::source_location::current());
 
 int enum_cast(::support::net::Domain domain);

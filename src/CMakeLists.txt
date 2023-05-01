@@ -14,10 +14,11 @@ add_library(support
     STATIC
         Log.cpp
         ThreadPool.cpp
-        Schedular.cpp
         Net.cpp
         Client/SimpleClient.cpp
         Server/SimpleServer.cpp
+        Server/ConnectionManager.cpp
+        Server/MultiServer.cpp
 )
 
 target_include_directories(support PUBLIC ${SUPPORT_INCLUDE_DIR})

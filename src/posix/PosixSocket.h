@@ -36,6 +36,8 @@ public:
     std::size_t read(void* buffer, std::size_t nbytes) override;
     std::size_t write(const void* buffer, std::size_t nbytes) override;
 
+    int native_handler() const noexcept override { return fd_; }
+
 private:
     int fd_;
 

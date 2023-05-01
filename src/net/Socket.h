@@ -45,6 +45,8 @@ public:
     virtual std::size_t read(void* buffer, std::size_t nbytes) = 0;
     virtual std::size_t write(const void* buffer, std::size_t nbytes) = 0;
 
+    virtual int native_handler() const noexcept = 0;
+
 protected:
     Domain domain_;
     Type type_;
@@ -54,7 +56,8 @@ class SocketDeleter {
 public:
     void operator()(Socket* socket)
     {
-        socket->close();
+        if (socket->is_valid())
+            socket->close();
     }
 };
 

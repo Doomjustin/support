@@ -10,14 +10,14 @@
 
 namespace support::posix {
 
-void check_result(int res, std::string_view caller)
+void check_result(int res, const std::string& caller)
 {
     if (res == -1) {
         auto cur_errno = errno;
         support::log::error("failed to {}", caller);
         throw std::system_error{ cur_errno,
                                  std::generic_category(),
-                                 caller.data() };
+                                 caller.c_str() };
     }
 }
 

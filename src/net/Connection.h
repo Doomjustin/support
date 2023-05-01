@@ -3,6 +3,7 @@
 
 #include "support/Net.h"
 #include "Socket.h"
+#include "support/Noncopyable.h"
 
 #include <memory>
 
@@ -35,6 +36,10 @@ public:
     {
         return socket_->type();
     }
+
+    int native_handler() const noexcept override { return socket_->native_handler(); }
+
+    void close() const noexcept override { socket_->close(); }
 
 private:
     SocketPtr socket_;

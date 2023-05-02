@@ -13,7 +13,7 @@ void Selector::start()
 {
     is_active_ = true;
 
-    while (true) {
+    while (is_active_) {
         std::unique_lock<std::mutex> locker{ m_ };
         cv_.wait(locker, [this] () { return !connections_.empty(); });
         locker.unlock();
@@ -34,7 +34,7 @@ void Selector::stop()
 
 void Selector::add_connection(std::unique_ptr<support::net::IConnection> connection) noexcept
 {
-    support::net::ConnectionManager::add_connection(std::move(connection));
+    support::net::Worker::add_connection(std::move(connection));
     cv_.notify_one();
 }
 

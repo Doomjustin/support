@@ -12,13 +12,13 @@
 
 namespace support::net {
 
-class ConnectionManager {
+class Worker {
 public:
     using ReadCallback = std::function<void(IConnection&)>;
     using ExceptCallback = std::function<void(IConnection&)>;
 
 public:
-    ~ConnectionManager() {}
+    ~Worker() {}
 
     virtual void start() = 0;
 
@@ -48,7 +48,7 @@ protected:
     bool is_registered(IConnection& connection) const;
 };
 
-std::unique_ptr<ConnectionManager> make_manager();
+std::unique_ptr<Worker> make_worker();
 
 } // namespace support::net
 

@@ -1,4 +1,4 @@
-#include "support/Server/ConnectionManager.h"
+#include "support/Server/Worker.h"
 
 #include "../posix/Selector.h"
 #include <memory>
@@ -6,13 +6,13 @@
 
 namespace support::net {
 
-std::size_t ConnectionManager::size() const noexcept
+std::size_t Worker::size() const noexcept
 {
     std::lock_guard<std::mutex> locker{ m_ };
     return connections_.size();
 }
 
-void ConnectionManager::add_connection(std::unique_ptr<IConnection> connection) noexcept
+void Worker::add_connection(std::unique_ptr<IConnection> connection) noexcept
 {
     std::lock_guard<std::mutex> locker{ m_ };
     if (is_registered(*connection))
@@ -20,12 +20,12 @@ void ConnectionManager::add_connection(std::unique_ptr<IConnection> connection) 
     connections_.emplace_back(std::move(connection));
 }
 
-void ConnectionManager::erase_invalid_connections()
+void Worker::erase_invalid_connections()
 {
     std::erase_if(connections_, [] (auto& connection) { return !connection->is_valid(); });
 }
 
-bool ConnectionManager::is_registered(IConnection& connection) const
+bool Worker::is_registered(IConnection& connection) const
 {
     auto res = std::find_if(connections_.begin(), connections_.end(),
             [&connection] (auto& value) {
@@ -34,7 +34,7 @@ bool ConnectionManager::is_registered(IConnection& connection) const
     return res != connections_.end();
 }
 
-std::unique_ptr<ConnectionManager> make_manager()
+std::unique_ptr<Worker> make_worker()
 {
     return std::make_unique<posix::Selector>();
 }

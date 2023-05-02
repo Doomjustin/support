@@ -31,7 +31,7 @@ void MultiThreadServer::start()
 
 void MultiThreadServer::create_new_manager()
 {
-    auto connection_manager = make_manager();
+    auto connection_manager = make_worker();
     using namespace std::placeholders;
     connection_manager->on_read(std::bind(&MultiThreadServer::on_read, this, _1));
     // TODO: write事件有意义吗？
@@ -39,12 +39,12 @@ void MultiThreadServer::create_new_manager()
     connection_managers_.emplace_back(std::move(connection_manager));
 
     // 不管理thread
-    std::thread t{ &ConnectionManager::start, std::ref(*connection_managers_.back()) };
+    std::thread t{ &Worker::start, std::ref(*connection_managers_.back()) };
     t.detach();
 }
 
 // 适合的manager来放置新的connection
-ConnectionManager* MultiThreadServer::get_available_manager()
+Worker* MultiThreadServer::get_available_manager()
 {
     if (connection_managers_.size() < max_threads_) {
         // 查找是否有空闲的manager

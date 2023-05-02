@@ -17,7 +17,7 @@ add_library(support
         Net.cpp
         Client/SimpleClient.cpp
         Server/SimpleServer.cpp
-        Server/ConnectionManager.cpp
+        Server/Worker.cpp
         Server/MultiServer.cpp
 )
 

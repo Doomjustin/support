@@ -1,7 +1,7 @@
 #ifndef CPP_SUPPORT_SERVER_MULTI_SERVER_H
 #define CPP_SUPPORT_SERVER_MULTI_SERVER_H
 
-#include "ConnectionManager.h"
+#include "Worker.h"
 #include "support/Net.h"
 
 #include <cstdint>
@@ -34,12 +34,12 @@ public:
 private:
     Endpoint self_;
     std::unique_ptr<IAcceptor> acceptor_;
-    std::vector<std::unique_ptr<ConnectionManager>> connection_managers_;
+    std::vector<std::unique_ptr<Worker>> connection_managers_;
 
     static std::uint8_t max_threads_;  // 16
 
     // 适合的manager来放置新的connection
-    ConnectionManager* get_available_manager();
+    Worker* get_available_manager();
 
     void create_new_manager();
 };

@@ -38,10 +38,10 @@ private:
 
     static std::uint8_t max_threads_;  // 16
 
-    // 适合的manager来放置新的connection
-    Worker* get_available_manager();
+    // 适合的worker来放置新的connection -> 空闲或者连接数最少的worker
+    Worker* get_available_worker();
 
-    void create_new_manager();
+    void create_new_worker();
 };
 
 } // namespace support::net

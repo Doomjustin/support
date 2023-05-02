@@ -1,5 +1,5 @@
-#ifndef CPP_SUPPORT_SERVER_CONNECTION_MANAGER_H
-#define CPP_SUPPORT_SERVER_CONNECTION_MANAGER_H
+#ifndef CPP_SUPPORT_SERVER_WORKER_H
+#define CPP_SUPPORT_SERVER_WORKER_H
 
 #include "../Net.h"
 
@@ -52,4 +52,4 @@ std::unique_ptr<Worker> make_worker();
 
 } // namespace support::net
 
-#endif // CPP_SUPPORT_SERVER_CONNECTION_MANAGER_H
+#endif // CPP_SUPPORT_SERVER_WORKER_H

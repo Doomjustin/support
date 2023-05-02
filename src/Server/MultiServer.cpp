@@ -23,13 +23,13 @@ void MultiThreadServer::start()
     while (true) {
         auto new_connection = acceptor_->accept();
 
-        // 放到一个合适的manager中执行 -> 空闲或者连接数最少的manager
-        auto available_manager = get_available_manager();
+        // 放到一个合适的worker中执行 -> 空闲或者连接数最少的worker
+        auto available_manager = get_available_worker();
         available_manager->add_connection(std::move(new_connection));
     }
 }
 
-void MultiThreadServer::create_new_manager()
+void MultiThreadServer::create_new_worker()
 {
     auto connection_manager = make_worker();
     using namespace std::placeholders;
@@ -43,19 +43,21 @@ void MultiThreadServer::create_new_manager()
     t.detach();
 }
 
-// 适合的manager来放置新的connection
-Worker* MultiThreadServer::get_available_manager()
+// 适合的worker来放置新的connection -> 空闲或者连接数最少的worker
+Worker* MultiThreadServer::get_available_worker()
 {
+    // 查找空闲worker或者创建新worker
     if (connection_managers_.size() < max_threads_) {
-        // 查找是否有空闲的manager
+        // 查找是否有空闲的worker
         for (auto& manager: connection_managers_)
             if (manager->size() == 0)
                 return manager.get();
-        // 否则创建新的manager
-        create_new_manager();
+        // 否则创建新的worker
+        create_new_worker();
         return connection_managers_.back().get();
     }
 
+    // 查找connections最少得worker
     int least_size = 0;
     int least_index = 0;
     for (int i = 0; i < connection_managers_.size(); ++i) {

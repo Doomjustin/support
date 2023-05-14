@@ -139,13 +139,13 @@ public:
     // 执行越界检查
     Reference at(Size pos)
     {
-        is_overflow(pos);
+        overflow_check(pos);
         return *(start_of_storage_ + pos);
     }
 
     ConstReference at(Size pos) const
     {
-        is_overflow(pos);
+        overflow_check(pos);
         return *(start_of_storage_ + pos);
     }
 
@@ -177,7 +177,7 @@ public:
 
 private:
     static std::uint8_t default_capacity;             // 默认初始化时的容量大小
-    static unsigned int default_expand_coefficient;   // 默认扩容系数
+    static unsigned int expand_coefficient;           // 默认扩容系数
 
     Allocator allocator_;
     //    |------|__________|
@@ -188,13 +188,13 @@ private:
     Pointer end_of_storage_;
 
     // 检查pos是否越界
-    void is_overflow(Size pos) const
+    void overflow_check(Size pos) const
     {
         if (pos >= size())
             throw std::out_of_range{ "List overflow" };
     }
 
-    // 销毁已分配对象
+    // 销毁已分配内存
     void destroy()
     {
         std::allocator_traits<Allocator>::destroy(allocator_, start_of_storage_);
@@ -207,26 +207,26 @@ private:
             return;
 
         auto tmp_size = size();
-        auto new_memory = std::allocator_traits<Allocator>::allocate(allocator_,
-                                                                     default_expand_coefficient * capacity());
+        auto new_storage = std::allocator_traits<Allocator>::allocate(allocator_,
+                                                                      expand_coefficient * capacity());
 
-        std::uninitialized_move(begin(), end(), new_memory);
+        std::uninitialized_move(begin(), end(), new_storage);
         destroy();
 
-        start_of_storage_ = new_memory;
+        start_of_storage_ = new_storage;
         element_ = start_of_storage_ + tmp_size;
-        end_of_storage_ = start_of_storage_ + tmp_size * default_expand_coefficient;
+        end_of_storage_ = start_of_storage_ + tmp_size * expand_coefficient;
     }
 
     // 收缩容积
     // 前提: size() > new_size
     void shrink(Size new_size)
     {
-        auto new_memory = std::allocator_traits<Allocator>::allocate(allocator_, new_size);
-        std::move(start_of_storage_, start_of_storage_ + size(), new_memory);
+        auto new_storage = std::allocator_traits<Allocator>::allocate(allocator_, new_size);
+        std::move(start_of_storage_, start_of_storage_ + size(), new_storage);
         destroy();
 
-        start_of_storage_ = new_memory;
+        start_of_storage_ = new_storage;
         element_ = end_of_storage_ = start_of_storage_ + new_size;
     }
 
@@ -248,7 +248,7 @@ template<typename T, typename AllocatorType>
 std::uint8_t List<T, AllocatorType>::default_capacity = 4;
 
 template<typename T, typename AllocatorType>
-unsigned int List<T, AllocatorType>::default_expand_coefficient = 2;
+unsigned int List<T, AllocatorType>::expand_coefficient = 2;
 
 } // namespace support
 

@@ -1,4 +1,4 @@
-#include "support/Server/SimpleServer.h"
+#include "support/server/SimpleServer.h"
 
 #include <cstdlib>
 #include <iostream>

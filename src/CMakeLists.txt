@@ -15,10 +15,10 @@ add_library(support
         Log.cpp
         ThreadPool.cpp
         Net.cpp
-        Client/SimpleClient.cpp
-        Server/SimpleServer.cpp
-        Server/Worker.cpp
-        Server/MultiServer.cpp
+        client/SimpleClient.cpp
+        server/SimpleServer.cpp
+        server/Worker.cpp
+        server/MultiServer.cpp
 )
 
 target_include_directories(support PUBLIC ${SUPPORT_INCLUDE_DIR})

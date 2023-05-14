@@ -1,3 +1,13 @@
+function(add_catch2_test target source)
+    add_executable(${target} ${source})
+
+    target_link_libraries(${target}
+        PRIVATE
+            support
+            Catch2::Catch2WithMain)
+endfunction()
+
+
 function(add_support_test target source)
     add_executable(${target} ${source})
     target_link_libraries(${target} support)
@@ -15,3 +25,5 @@ include(CTest)
 add_executable(test-catch2 test_catch2.cpp)
 target_link_libraries(test-catch2 PRIVATE Catch2::Catch2WithMain)
 catch_discover_tests(test-catch2)
+
+add_catch2_test(test-list test_list.cpp)

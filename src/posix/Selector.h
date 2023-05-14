@@ -1,7 +1,7 @@
 #ifndef CPP_SUPPORT_POSIX_SELECOT_H
 #define CPP_SUPPORT_POSIX_SELECOT_H
 
-#include "support/Server/Worker.h"
+#include "support/server/Worker.h"
 
 #include <atomic>
 #include <condition_variable>

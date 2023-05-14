@@ -208,7 +208,7 @@ private:
 
         auto tmp_size = size();
         auto new_memory = std::allocator_traits<Allocator>::allocate(allocator_,
-                                                                              default_expand_coefficient * capacity());
+                                                                     default_expand_coefficient * capacity());
 
         std::uninitialized_move(begin(), end(), new_memory);
         destroy();
